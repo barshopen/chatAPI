@@ -6,6 +6,7 @@ import datetime
 from chat import db_handler, bcrypt
 from chat.models import User
 
+EXPIRED_IN = datetime.timedelta(minutes=30) 
 
 def register_user(username:str, password:str, password_again:str)-> int:
     """@ret http status code 200, 409, 422
@@ -28,6 +29,7 @@ def authenticate_user(username:str, passowrd:str)->Tuple:
     if not(user and user.check_password(passowrd)):
         return "Wrong credentials", 409 
     expires = datetime.timedelta(days=7)
-    access_token = create_access_token(identity=str(user.id), expires_delta=expires)
+    print(user.username)
+    access_token = create_access_token(identity={"username":user.username}, expires_delta=EXPIRED_IN)
     return jsonify({"token": access_token}), 200
     

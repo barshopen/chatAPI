@@ -5,7 +5,7 @@ FILE_PATH = ".env"
 
 def confirm(message:str):
     answer = input(message) 
-    while answer not in ["Y", "N"]: 
+    while answer.lower() not in ["y", "n"]: 
         answer = input("please answer only with Y or N ")
 
     return answer
