@@ -28,8 +28,8 @@ def authenticate_user(username:str, passowrd:str)->Tuple:
     user = User.query.filter_by(username=username).first()
     if not(user and user.check_password(passowrd)):
         return "Wrong credentials", 409 
+    
     expires = datetime.timedelta(days=7)
-    print(user.username)
     access_token = create_access_token(identity={"username":user.username}, expires_delta=EXPIRED_IN)
     return jsonify({"token": access_token}), 200
     

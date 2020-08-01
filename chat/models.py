@@ -1,5 +1,5 @@
 from chat import db
-from flask_bcrypt import check_password_hash
+from flask_bcrypt import check_password_hash, generate_password_hash
 import datetime
 
 class User(db.Model):
@@ -9,7 +9,6 @@ class User(db.Model):
 
     def check_password(self, password:str):
         return check_password_hash(self.password_hash, password)
-    
     
     def __repr__(self):
         return f"User('{self.username}')"
@@ -33,16 +32,13 @@ class Message(db.Model):
 
 db.drop_all()
 db.create_all()
-a1 = User(username=1, password_hash="password")
-print(a1)
+a1 = User(username=1, password_hash=generate_password_hash("password"))
 db.session.add(a1)
-a2 = User(username="ben", password_hash="password")
+a2 = User(username="ben", password_hash=generate_password_hash("password"))
 db.session.add(a2)
-a3 = User(username="berry", password_hash="password")
+a3 = User(username="berry", password_hash=generate_password_hash("password"))
 db.session.add(a3)
 db.session.commit()
-for i in User.query.all():
-    print(i)
 b = Message(subject="hello", creation_date=datetime.datetime.now(), message="hi :)", sender=a1, receiver=a2)
 db.session.add(b)
 b = Message(subject="hello again!", creation_date=datetime.datetime.now(), message="hi :) :P :)", sender=a1, receiver=a3)
