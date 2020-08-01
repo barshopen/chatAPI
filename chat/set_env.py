@@ -3,6 +3,13 @@ import click
 from termcolor import colored
 FILE_PATH = ".env"
 
+def confirm(message:str):
+    answer = input(message) 
+    while answer not in ["Y", "N"]: 
+        answer = input("please answer only with Y or N ")
+
+    return answer
+
 if 'ENV_FILE_LOCATION' not in os.environ:
     answer = confirm(colored(r"Notice, in order to get this server to work, you'll need to addd enviroment variable. Continue? (Y\N)"))
     if answer == "N":
@@ -16,10 +23,3 @@ if not os.path.exists(relative_path):
         while key is "":
             key =input("Please sign you key")
         f.write("JWT_SECRET_KEY = '{}}'".format(key))
-
-def confirm(message:str):
-    answer = input(message) 
-    while answer not in ["Y", "N"]: 
-        answer = input("please answer only with Y or N ")
-
-    return answer
