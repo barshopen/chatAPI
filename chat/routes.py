@@ -1,6 +1,6 @@
 from flask import render_template, url_for, jsonify, request, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from chat import app, models, auth
+from chat import app, models, auth , data_provider
 import datetime
 
 
@@ -9,13 +9,13 @@ import datetime
 @app.route("/read/message/<int:message_id>", methods=['GET'])
 @jwt_required
 def get_message(message_id):
+    username = get_jwt_identity()['username']
     
-    return jsonify(data_provider.get_message(message_id))
+    return jsonify(data_provider.get_message(username, message_id))
 
 @app.route("/hello", methods=['GET'])
 @jwt_required
 def hello():
-    print(get_jwt_identity())
     return "hello"
 
 
