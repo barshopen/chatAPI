@@ -17,9 +17,9 @@ def delete_message(username:str, message_id:int):
         return "Please specify message_id", 409
     
     status = db_handler.delete_message(username, message_id)
-    if status == db_handler.DELETE_FAILED:
+    if status == common_utills.DeleteMessageStatusCodes.DELETE_FAILED:
         return "The server encountered an unexpected condition which prevented it from fulfilling the request, please try agian later", 500
-    elif status == db_handler.MESSAGE_DOES_NOT_EXIST:
+    elif status == common_utills.DeleteMessageStatusCodes.MESSAGE_DOES_NOT_EXIST:
         return "Message doesn't exist", 404
-    elif status == db_handler.DELETE_SUCCESSFUL:
+    elif status == common_utills.DeleteMessageStatusCodes.DELETE_SUCCESSFUL:
         return "Message deleted successfully", 200

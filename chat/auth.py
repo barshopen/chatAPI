@@ -3,7 +3,7 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from typing import Tuple
 from flask_jwt_extended import create_access_token
 import datetime
-from chat import db_handler, bcrypt
+from chat import db_handler, bcrypt, common_utills
 from chat.models import User
 
 EXPIRED_IN = datetime.timedelta(hours=2) 
@@ -23,8 +23,11 @@ def register_user(username:str, password:str, password_again:str)-> int:
         return "Password should match password_again field", 422
     
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-    if db_handler.create_user(username, hashed_password) == db_handler.FAILURE_USER_EXIST:
+    status_code = db_handler.create_user(username, hashed_password) 
+    if status_code == common_utills.RegisterStatusCodes.FAILURE_USER_ALREADY_EXIST:
         return "Username already exist", 409
+    elif status_code == common_utills.RegisterStatusCodes.UNKOWN_ISSUE:
+        return "The server encountered an unexpected condition which prevented it from fulfilling the request, please try agian later", 500
     
     return jsonify({"username": username}), 201
 

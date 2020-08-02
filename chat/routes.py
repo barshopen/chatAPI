@@ -32,16 +32,16 @@ def get_messages():
     username = get_jwt_identity()['username']
     if str(request.url_rule) == "/read/messages":
         print("read all")
-        request_flag = common_utills.GetAllMessagesFlags.ALL
+        request_flag = common_utills.GetAllMessagesStatusCodes.ALL
     elif str(request.url_rule) == "/read/messages/received_only":
         print("received only")
-        request_flag = common_utills.GetAllMessagesFlags.RECEIVED_ONLY
+        request_flag = common_utills.GetAllMessagesStatusCodes.RECEIVED_ONLY
     elif str(request.url_rule) == "/read/messages/unread_only":
         print("unread only")
-        request_flag = common_utills.GetAllMessagesFlags.UNREAD_ONLY
+        request_flag = common_utills.GetAllMessagesStatusCodes.UNREAD_ONLY
     elif str(request.url_rule) == "/read/messages/sent_only":
         print("sent only")
-        request_flag = common_utills.GetAllMessagesFlags.SENT_ONLY
+        request_flag = common_utills.GetAllMessagesStatusCodes.SENT_ONLY
         
     return data_provide_request_handler.get_all_messages(username, request_flag)
     
@@ -82,4 +82,4 @@ def register():
     password = form.get('password')
     password_again = form.get('password_again')
     return auth.register_user(username, password, password_again) 
-    
+

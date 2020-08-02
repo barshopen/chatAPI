@@ -41,21 +41,7 @@ def get_user_id(username:str)->int:
 def get_user(username:str)->User:
     return User.query.filter_by(username=username).first()
 
-# db.drop_all()
-# db.create_all()
-# a1 = User(username=1, password_hash=generate_password_hash("password"))
-# db.session.add(a1)
-# a2 = User(username="ben", password_hash=generate_password_hash("password"))
-# db.session.add(a2)
-# a3 = User(username="berry", password_hash=generate_password_hash("password"))
-# db.session.add(a3)
-# db.session.commit()
-# b = Message(subject="hello", creation_date=datetime.datetime.utcnow(), message="hi :)", sender=a1, receiver=a2)
-# db.session.add(b)
-# b = Message(subject="hello again!", creation_date=datetime.datetime.utcnow(), message="hi :) :P :)", sender=a1, receiver=a3)
-# db.session.add(b)
-# b = Message(subject="hey there!!", creation_date=datetime.datetime.utcnow(), message="hi you yo :)", sender=a2, receiver=a3)
-# db.session.add(b)
-# b = Message(subject="hellooooo", creation_date=datetime.datetime.utcnow(), message="hi there :)", sender=a3, receiver=a2)
-# db.session.add(b)
-# db.session.commit()
+
+# some initial data to help me debug
+db.drop_all()
+db.create_all()

@@ -1,18 +1,14 @@
-from chat import db
+from chat import db, models
 from chat.models import User, Message, get_user, get_user_id
 from sqlalchemy import or_, and_
 from sqlalchemy.exc import IntegrityError
 from chat import common_utills
 
-SUCCESS = 1
-FAILURE_USER_ALREADY_EXIST = 2
 
 SENT = 1
 RECIEVED = 2
 
-MESSAGE_DOES_NOT_EXIST = 1
-DELETE_FAILED = 2
-DELETE_SUCCESSFUL = 3
+
 
 def delete_message(username:str, message_id:int)->int:
     user_id = get_user_id(username)
@@ -20,14 +16,14 @@ def delete_message(username:str, message_id:int)->int:
     message = get_message_by_id(user_id, message_id)
     
     if not message:
-        return MESSAGE_DOES_NOT_EXIST
+        return common_utills.DeleteMessageStatusCodes.MESSAGE_DOES_NOT_EXIST
     Message.query.filter(Message.id == message.id).delete()
     db.session.commit()
     
     message = get_message_by_id(username, message_id)
     if message:
-        return DELETE_FAILED
-    return DELETE_SUCCESSFUL
+        return common_utills.DeleteMessageStatusCodes.DELETE_FAILED
+    return common_utills.DeleteMessageStatusCodes.DELETE_SUCCESSFUL
 
     
 def write_message(sender_username:str, receiver_username:str, subject:str, message:str)->Message:
@@ -50,11 +46,11 @@ def get_all_messages(username:str, request_flag:int):
         Message.receiver_id==user_id
         ))
     
-    if request_flag == common_utills.GetAllMessagesFlags.RECEIVED_ONLY:
+    if request_flag == common_utills.GetAllMessagesStatusCodes.RECEIVED_ONLY:
         messages = messages.filter_by(receiver_id=user_id)
-    elif request_flag == common_utills.GetAllMessagesFlags.SENT_ONLY:
+    elif request_flag == common_utills.GetAllMessagesStatusCodes.SENT_ONLY:
         messages = messages.filter_by(sender_id=user_id)
-    elif request_flag == common_utills.GetAllMessagesFlags.UNREAD_ONLY:
+    elif request_flag == common_utills.GetAllMessagesStatusCodes.UNREAD_ONLY:
         messages = messages.filter_by(receiver_id=user_id, unread_flag=True)
     
     messages = messages.order_by(db.desc(Message.creation_date))
@@ -88,11 +84,14 @@ def get_message_by_id(user_id, message_id)->Message:
 
 
 def create_user(username:str, hashed_password:str)->int:
+    if models.get_user(username):
+        return common_utills.RegisterStatusCodes.FAILURE_USER_ALREADY_EXIST
     user = User(username=username, password_hash=hashed_password)
     db.session.add(user)
-    try: 
-        db.session.commit()
-    except IntegrityError as e:
-        print(e)
-        return FAILURE_USER_ALREADY_EXIST
-    return SUCCESS
+    db.session.commit()
+    # try: 
+    #     db.session.commit()
+    # except IntegrityError as e:
+    #     print(e)
+    #     return common_utills.RegisterStatusCodes.UNKOWN_ISSUE
+    return common_utills.RegisterStatusCodes.SUCCESS
