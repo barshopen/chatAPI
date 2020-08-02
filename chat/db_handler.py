@@ -5,12 +5,31 @@ from sqlalchemy.exc import IntegrityError
 from chat import common_utills
 
 SUCCESS = 1
-FAILURE_USER_EXIST = 2
+FAILURE_USER_ALREADY_EXIST = 2
 
 SENT = 1
 RECIEVED = 2
 
+MESSAGE_DOES_NOT_EXIST = 1
+DELETE_FAILED = 2
+DELETE_SUCCESSFUL = 3
 
+def delete_message(username:str, message_id:int)->int:
+    user_id = get_user_id(username)
+
+    message = get_message_by_id(user_id, message_id)
+    
+    if not message:
+        return MESSAGE_DOES_NOT_EXIST
+    Message.query.filter(Message.id == message.id).delete()
+    db.session.commit()
+    
+    message = get_message_by_id(username, message_id)
+    if message:
+        return DELETE_FAILED
+    return DELETE_SUCCESSFUL
+
+    
 def write_message(sender_username:str, receiver_username:str, subject:str, message:str)->Message:
     message = Message(subject=subject, 
                       message=message, 
@@ -21,6 +40,7 @@ def write_message(sender_username:str, receiver_username:str, subject:str, messa
     db.session.commit()
     
     return message
+    
     
 def get_all_messages(username:str, request_flag:int):
     user_id = get_user_id(username)
@@ -37,16 +57,12 @@ def get_all_messages(username:str, request_flag:int):
     elif request_flag == common_utills.GetAllMessagesFlags.UNREAD_ONLY:
         messages = messages.filter_by(receiver_id=user_id, unread_flag=True)
     
-    messages = messages.order_by(db.desc(Message.creation_date)).all()
-    for message in messages:
-        print(message.unread_flag)
-        if message.receiver_id == user_id:
-            message.unread_flag = False
+    messages.filter_by(receiver_id=user_id, unread_flag=True).update({"unread_flag": False})
+    messages = messages.order_by(db.desc(Message.creation_date))
     db.session.commit()
-    return messages
-
+    return messages.all()
     
-def get_message(sent_or_recieved, username, message_id=None):
+def get_message(sent_or_recieved, username, message_id=None)->Message:
     if sent_or_recieved not in [SENT, RECIEVED]:
         raise ValueError("Unexpected value for sent_or_recieved")
     user_id = get_user_id(username)
@@ -59,9 +75,10 @@ def get_message(sent_or_recieved, username, message_id=None):
     else:
         message = Message.query.filter_by(receiver_id=user_id).order_by(db.desc(Message.creation_date)).first()
     message.unread_flag = False
+    db.session.commit()
     return message
  
-def get_message_by_id(user_id, message_id):
+def get_message_by_id(user_id, message_id)->Message:
     message = Message.query.filter(and_(
         or_(
         Message.sender_id==user_id, 
@@ -70,7 +87,9 @@ def get_message_by_id(user_id, message_id):
         Message.id==message_id
         )
         ).order_by(db.desc(Message.creation_date)).first()
-    message.unread_flag = False
+    if message:
+        message.unread_flag = False
+        db.session.commit()
     return message
 
 
@@ -81,8 +100,9 @@ def create_user(username:str, hashed_password:str)->int:
         db.session.commit()
     except IntegrityError as e:
         print(e)
-        return FAILURE_USER_EXIST
+        return FAILURE_USER_ALREADY_EXIST
     return SUCCESS
+
 
 def get_user_id(username:str)->int:
     return get_user(username).id

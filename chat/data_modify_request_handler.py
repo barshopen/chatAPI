@@ -12,5 +12,14 @@ def write_message(sender_username:str, receiver_username:str, subject:str, messa
     
     return jsonify(common_utills.message_to_dict(message)), 200
 
-def write_message(username:str, message_id:int):
-    pass
+def delete_message(username:str, message_id:int):
+    if not message_id:
+        return "Please specify message_id", 409
+    
+    status = db_handler.delete_message(username, message_id)
+    if status == db_handler.DELETE_FAILED:
+        return "The server encountered an unexpected condition which prevented it from fulfilling the request, please try agian later", 500
+    elif status == db_handler.MESSAGE_DOES_NOT_EXIST:
+        return "Message doesn't exist", 404
+    elif status == db_handler.DELETE_SUCCESSFUL:
+        return "Message deleted successfully", 200

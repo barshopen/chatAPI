@@ -6,7 +6,7 @@ import datetime
 from chat import db_handler, bcrypt
 from chat.models import User
 
-EXPIRED_IN = datetime.timedelta(minutes=30) 
+EXPIRED_IN = datetime.timedelta(hours=2) 
 
 def register_user(username:str, password:str, password_again:str)-> int:
     """@ret http status code 200, 409, 422
