@@ -10,4 +10,4 @@ if not os.path.exists(path):
         key = input("Please sign your key")
         while key is "":
             key =input("Please sign you key")
-        f.write("\nJWT_SECRET_KEY = '{}}'".format(key))
+        f.write("\nJWT_SECRET_KEY = '{}'".format(key))
