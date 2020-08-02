@@ -43,5 +43,5 @@ def get_user(username:str)->User:
 
 
 # some initial data to help me debug
-db.drop_all()
+#db.drop_all()
 db.create_all()

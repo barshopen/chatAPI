@@ -5,12 +5,16 @@ def write_message(sender_username:str, receiver_username:str, subject:str, messa
     if not(receiver_username and subject and message):
         return "Please make sure to include the receiver, subject and message fields in your request", 409
     
-    message = db_handler.write_message(sender_username, receiver_username, subject, message)
+    message, status = db_handler.write_message(sender_username, receiver_username, subject, message)
+    
+    if status == common_utills.SendMessageStatusCode.DESTINATION_DOES_NOT_EXIST:
+        return "Destination does not exist! Please double check sender's username spelling.", 404
     
     if not message:
         return "The server encountered an unexpected condition which prevented it from fulfilling the request, please try agian later", 500
     
     return jsonify(common_utills.message_to_dict(message)), 200
+
 
 def delete_message(username:str, message_id:int):
     if not message_id:

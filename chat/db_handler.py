@@ -3,6 +3,7 @@ from chat.models import User, Message, get_user, get_user_id
 from sqlalchemy import or_, and_
 from sqlalchemy.exc import IntegrityError
 from chat import common_utills
+from typing import Tuple
 
 
 SENT = 1
@@ -26,7 +27,10 @@ def delete_message(username:str, message_id:int)->int:
     return common_utills.DeleteMessageStatusCodes.DELETE_SUCCESSFUL
 
     
-def write_message(sender_username:str, receiver_username:str, subject:str, message:str)->Message:
+def write_message(sender_username:str, receiver_username:str, subject:str, message:str)->Tuple[Message, int]:
+    if not get_user(sender_username) or not get_user(receiver_username):
+        return None, common_utills.SendMessageStatusCode.DESTINATION_DOES_NOT_EXIST
+    
     message = Message(subject=subject, 
                       message=message, 
                       sender=get_user(sender_username), 
@@ -35,7 +39,7 @@ def write_message(sender_username:str, receiver_username:str, subject:str, messa
     db.session.add(message)
     db.session.commit()
     
-    return message
+    return message, common_utills.SendMessageStatusCode.SUCCESS
     
     
 def get_all_messages(username:str, request_flag:int):

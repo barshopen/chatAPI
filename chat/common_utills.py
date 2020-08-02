@@ -7,6 +7,10 @@ class GetAllMessagesStatusCodes(Enum):
     RECEIVED_ONLY = 2
     ALL = 3
 
+class SendMessageStatusCode(Enum):
+    DESTINATION_DOES_NOT_EXIST = 0
+    SUCCESS = 1
+
 class RegisterStatusCodes(Enum):
     FAILURE_USER_ALREADY_EXIST = 0
     SUCCESS = 1
