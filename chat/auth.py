@@ -22,7 +22,7 @@ def register_user(username:str, password:str, password_again:str)-> int:
     if db_handler.create_user(username, hashed_password) == db_handler.FAILURE_USER_EXIST:
         return "Username already exist", 409
     
-    return username, 200
+    return jsonify({"username": username}), 201
 
 def authenticate_user(username:str, passowrd:str)->Tuple:
     user = User.query.filter_by(username=username).first()
