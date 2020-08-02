@@ -1,7 +1,5 @@
 import os
-import click
 import pathlib
-from termcolor import colored
 FILE_PATH = ".env"
 
 path = os.path.join(pathlib.Path(__file__).parent.absolute(), FILE_PATH)
