@@ -15,8 +15,12 @@ def register_user(username:str, password:str, password_again:str)-> int:
     422 : something's wrong with your password/ username
     """
     # this shouldn't be here...
-    if len(password)<8 or password != password_again:
-        return "Password should be more then 8 characters long", 422
+    if not (username and password and password_again):
+        return "Please make sure to include the following params: username, password, password_again", 422
+    elif len(password)<8:
+        return "Password should be more then 8 characters long and password_again should match password", 422
+    elif password != password_again:
+        return "Password should match password_again field", 422
     
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     if db_handler.create_user(username, hashed_password) == db_handler.FAILURE_USER_EXIST:

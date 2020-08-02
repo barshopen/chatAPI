@@ -11,6 +11,17 @@ SENT = 1
 RECIEVED = 2
 
 
+def write_message(sender_username:str, receiver_username:str, subject:str, message:str)->Message:
+    message = Message(subject=subject, 
+                      message=message, 
+                      sender=get_user(sender_username), 
+                      receiver=get_user(receiver_username)
+                      )
+    db.session.add(message)
+    db.session.commit()
+    
+    return message
+    
 def get_all_messages(username:str, request_flag:int):
     user_id = get_user_id(username)
     messages = Message.query.filter(
@@ -24,9 +35,7 @@ def get_all_messages(username:str, request_flag:int):
     elif request_flag == common_utills.GetAllMessagesFlags.SENT_ONLY:
         messages = messages.filter_by(sender_id=user_id)
     elif request_flag == common_utills.GetAllMessagesFlags.UNREAD_ONLY:
-        print("i'm here)")
         messages = messages.filter_by(receiver_id=user_id, unread_flag=True)
-    print("got here")
     
     messages = messages.order_by(db.desc(Message.creation_date)).all()
     for message in messages:
@@ -34,7 +43,6 @@ def get_all_messages(username:str, request_flag:int):
         if message.receiver_id == user_id:
             message.unread_flag = False
     db.session.commit()
-    print("got here 2")
     return messages
 
     
@@ -76,6 +84,8 @@ def create_user(username:str, hashed_password:str)->int:
         return FAILURE_USER_EXIST
     return SUCCESS
 
-def get_user_id(username:str):
-    return User.query.filter_by(username=username).first().id
-    
+def get_user_id(username:str)->int:
+    return get_user(username).id
+
+def get_user(username:str)->User:
+    return User.query.filter_by(username=username).first()
