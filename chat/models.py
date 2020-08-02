@@ -25,10 +25,21 @@ class Message(db.Model):
     
     sender = db.relationship(User, foreign_keys=[sender_id])
     receiver = db.relationship(User, foreign_keys=[receiver_id])
-
+    
+    def mark_as_read_if_called_from_receiver(self, caller_user:str):
+        caller_user_id = get_user_id(caller_user)
+        if self.receiver_id == caller_user_id:
+            self.unread_flag = False
+            db.session.commit()
+    
     def __repr__(self):
         return f"Message('{self.subject}')"
+    
+def get_user_id(username:str)->int:
+    return get_user(username).id
 
+def get_user(username:str)->User:
+    return User.query.filter_by(username=username).first()
 
 # db.drop_all()
 # db.create_all()

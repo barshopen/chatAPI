@@ -1,5 +1,5 @@
 from chat import db
-from chat.models import User, Message
+from chat.models import User, Message, get_user, get_user_id
 from sqlalchemy import or_, and_
 from sqlalchemy.exc import IntegrityError
 from chat import common_utills
@@ -57,7 +57,6 @@ def get_all_messages(username:str, request_flag:int):
     elif request_flag == common_utills.GetAllMessagesFlags.UNREAD_ONLY:
         messages = messages.filter_by(receiver_id=user_id, unread_flag=True)
     
-    messages.filter_by(receiver_id=user_id, unread_flag=True).update({"unread_flag": False})
     messages = messages.order_by(db.desc(Message.creation_date))
     db.session.commit()
     return messages.all()
@@ -74,8 +73,6 @@ def get_message(sent_or_recieved, username, message_id=None)->Message:
         message = Message.query.filter_by(sender_id=user_id).order_by(db.desc(Message.creation_date)).first()
     else:
         message = Message.query.filter_by(receiver_id=user_id).order_by(db.desc(Message.creation_date)).first()
-    message.unread_flag = False
-    db.session.commit()
     return message
  
 def get_message_by_id(user_id, message_id)->Message:
@@ -87,9 +84,6 @@ def get_message_by_id(user_id, message_id)->Message:
         Message.id==message_id
         )
         ).order_by(db.desc(Message.creation_date)).first()
-    if message:
-        message.unread_flag = False
-        db.session.commit()
     return message
 
 
@@ -102,10 +96,3 @@ def create_user(username:str, hashed_password:str)->int:
         print(e)
         return FAILURE_USER_ALREADY_EXIST
     return SUCCESS
-
-
-def get_user_id(username:str)->int:
-    return get_user(username).id
-
-def get_user(username:str)->User:
-    return User.query.filter_by(username=username).first()

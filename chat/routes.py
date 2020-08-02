@@ -39,7 +39,7 @@ def get_messages():
     elif str(request.url_rule) == "/read/messages/unread_only":
         print("unread only")
         request_flag = common_utills.GetAllMessagesFlags.UNREAD_ONLY
-    elif str(request.url_rule) == "/read/messages/messages/received_only":
+    elif str(request.url_rule) == "/read/messages/sent_only":
         print("sent only")
         request_flag = common_utills.GetAllMessagesFlags.SENT_ONLY
         
