@@ -12,7 +12,8 @@ class User(db.Model):
     
     def __repr__(self):
         return f"User('{self.username}')"
-   
+
+
 class Message(db.Model):
     id = db.Column(db.Integer,unique=True, primary_key=True)
     subject = db.Column(db.String(100), nullable=False)
@@ -34,7 +35,28 @@ class Message(db.Model):
     
     def __repr__(self):
         return f"Message('{self.subject}')"
+
+class MessageReceivers(db.Model):
+    id = db.Column(db.Integer,unique=True, primary_key=True)
+    is_sender = (db.Boolean, nullable=False) # sender if is_sender, else receiver
+
+    message_id = db.Column(db.Integer, db.ForeignKey(Message.id))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     
+    message = db.relationship(Message, foreign_keys=[message_id])
+    user = db.relationship(User, foreign_keys=[user_id])
+
+class UnreadFlag(db.Model):
+    id = db.Column(db.Integer,unique=True, primary_key=True)
+    was_read = (db.Boolean, nullable=False, default=False) # indicates whether the message was already read or not (false if unread)
+
+    message_id = db.Column(db.Integer, db.ForeignKey(Message.id))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    
+    message = db.relationship(Message, foreign_keys=[message_id])
+    user = db.relationship(User, foreign_keys=[user_id])
+
+
 def get_user_id(username:str)->int:
     return get_user(username).id
 
@@ -43,5 +65,5 @@ def get_user(username:str)->User:
 
 
 # some initial data to help me debug
-#db.drop_all()
+db.drop_all()
 db.create_all()
